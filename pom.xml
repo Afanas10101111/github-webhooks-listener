@@ -11,7 +11,7 @@
 
     <groupId>com.github.afanas10101111</groupId>
     <artifactId>github-webhooks-listener</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.1.0-SNAPSHOT</version>
     <name>github webhooks listener</name>
     <description>Simple API to run bash scripts</description>
 
