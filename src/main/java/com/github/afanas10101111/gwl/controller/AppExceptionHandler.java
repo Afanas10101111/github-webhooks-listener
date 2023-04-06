@@ -1,5 +1,6 @@
 package com.github.afanas10101111.gwl.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.afanas10101111.gwl.exeption.ScriptFileAccessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -15,16 +16,14 @@ import java.util.Arrays;
 @RestControllerAdvice
 public class AppExceptionHandler {
 
-    @ExceptionHandler
+    @ExceptionHandler({
+            HttpMediaTypeNotSupportedException.class,
+            HttpMessageNotReadableException.class,
+            JsonProcessingException.class
+    })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    void handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException ex) {
-        log.warn("handleHttpMediaTypeNotSupportedException -> {}", ex.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    void handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
-        log.warn("handleHttpMessageNotReadableException -> {}", ex.getMessage());
+    void handleBadRequestExceptions(Exception ex) {
+        log.warn("handleBadRequestExceptions -> {}: {}", ex.getClass().getSimpleName(), ex.getMessage());
     }
 
     @ExceptionHandler
