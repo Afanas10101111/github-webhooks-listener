@@ -1,6 +1,7 @@
 package com.github.afanas10101111.gwl.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.github.afanas10101111.gwl.exeption.HmacSignatureValidationException;
 import com.github.afanas10101111.gwl.exeption.ScriptFileAccessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,7 +20,8 @@ public class AppExceptionHandler {
     @ExceptionHandler({
             HttpMediaTypeNotSupportedException.class,
             HttpMessageNotReadableException.class,
-            JsonProcessingException.class
+            JsonProcessingException.class,
+            HmacSignatureValidationException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     void handleBadRequestExceptions(Exception ex) {

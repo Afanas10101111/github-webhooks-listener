@@ -13,7 +13,6 @@ import java.nio.charset.StandardCharsets;
 @Service
 public class CryptoServiceImpl implements CryptoService {
     public static final String ALGORITHM = "HmacSHA256";
-    public static final String SIGNATURE_PREFIX = "sha256=";
     public static final String ERROR = "invalid signature";
 
     @Value("${secret.token}")
@@ -26,9 +25,7 @@ public class CryptoServiceImpl implements CryptoService {
             SecretKeySpec secretKeySpec = new SecretKeySpec(token.getBytes(StandardCharsets.UTF_8), ALGORITHM);
             macInstance.init(secretKeySpec);
 
-            String computed = SIGNATURE_PREFIX + HexUtils.toHexString(
-                    macInstance.doFinal(payload.getBytes(StandardCharsets.UTF_8))
-            );
+            String computed = HexUtils.toHexString(macInstance.doFinal(payload.getBytes(StandardCharsets.UTF_8)));
             if (!computed.equals(signature)) {
                 throw new HmacSignatureValidationException(ERROR);
             }

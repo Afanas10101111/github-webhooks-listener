@@ -13,10 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest(classes = CryptoServiceImpl.class)
 class CryptoServiceTest {
     public static final String PAYLOAD = "some data";
-    public static final String VALID_SIGNATURE
-            = CryptoServiceImpl.SIGNATURE_PREFIX + "9a8acf0183fb80e5396d2a4183d040dc2f151be08da1705df7d41e68d2f354ea";
-    public static final String INVALID_SIGNATURE
-            = CryptoServiceImpl.SIGNATURE_PREFIX + "0a8acf0183fb80e5396d2a4183d040dc2f151be08da1705df7d41e68d2f354ea";
+    public static final String VALID_SIGNATURE = "9a8acf0183fb80e5396d2a4183d040dc2f151be08da1705df7d41e68d2f354ea";
+    public static final String INVALID_SIGNATURE = "0a8acf0183fb80e5396d2a4183d040dc2f151be08da1705df7d41e68d2f354ea";
 
     @Autowired
     private CryptoService cryptoService;

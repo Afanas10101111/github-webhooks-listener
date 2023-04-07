@@ -3,6 +3,7 @@ package com.github.afanas10101111.gwl.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.afanas10101111.gwl.dto.PushPayload;
+import com.github.afanas10101111.gwl.exeption.HmacSignatureValidationException;
 import com.github.afanas10101111.gwl.service.CryptoService;
 import com.github.afanas10101111.gwl.service.ScriptExecutor;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,6 +26,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class WebhookController {
     public static final String GLOBAL_MAPPING = "/gwl/v1";
     public static final String X_HUB_SIGNATURE_256 = "x-hub-signature-256";
+    public static final String SIGNATURE_PREFIX_REGEX = "^sha256=";
+    public static final String ERROR = X_HUB_SIGNATURE_256 + " is missing";
 
     private final ScriptExecutor scriptExecutor;
     private final CryptoService cryptoService;
@@ -32,17 +35,25 @@ public class WebhookController {
 
     @PostMapping(value = "/push/{branchName}/{scriptName}", consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public void handlePushEvent(
+    public void processPushEvent(
             @PathVariable String branchName,
             @PathVariable String scriptName,
             @RequestBody String payload,
             HttpServletRequest request
     ) throws JsonProcessingException {
-        cryptoService.validateHmacSignature(payload, request.getHeader(X_HUB_SIGNATURE_256));
+        validateSignature(request, payload);
         PushPayload pushPayload = objectMapper.readValue(payload, PushPayload.class);
-        log.info("handlePushEvent -> branchName={}; scriptName={}; ref={}", branchName, scriptName, pushPayload.ref());
+        log.info("processPushEvent -> branchName={}; scriptName={}; ref={}", branchName, scriptName, pushPayload.ref());
         if (pushPayload.ref() != null && pushPayload.ref().endsWith("/" + branchName)) {
             scriptExecutor.execute(scriptName);
         }
+    }
+
+    private void validateSignature(HttpServletRequest request, String payload) {
+        String signature = request.getHeader(X_HUB_SIGNATURE_256);
+        if (signature == null) {
+            throw new HmacSignatureValidationException(ERROR);
+        }
+        cryptoService.validateHmacSignature(payload, signature.replaceFirst(SIGNATURE_PREFIX_REGEX, ""));
     }
 }
