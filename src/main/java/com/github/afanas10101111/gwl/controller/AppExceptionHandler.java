@@ -1,12 +1,13 @@
 package com.github.afanas10101111.gwl.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.github.afanas10101111.gwl.exeption.HmacSignatureValidationException;
+import com.github.afanas10101111.gwl.exeption.InvalidSignatureException;
 import com.github.afanas10101111.gwl.exeption.ScriptFileAccessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -18,10 +19,11 @@ import java.util.Arrays;
 public class AppExceptionHandler {
 
     @ExceptionHandler({
+            MissingRequestHeaderException.class,
             HttpMediaTypeNotSupportedException.class,
             HttpMessageNotReadableException.class,
             JsonProcessingException.class,
-            HmacSignatureValidationException.class
+            InvalidSignatureException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     void handleBadRequestExceptions(Exception ex) {
