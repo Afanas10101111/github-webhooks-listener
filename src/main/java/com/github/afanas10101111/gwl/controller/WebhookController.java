@@ -3,9 +3,10 @@ package com.github.afanas10101111.gwl.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.afanas10101111.gwl.dto.PushPayload;
-import com.github.afanas10101111.gwl.exeption.InvalidSignatureException;
+import com.github.afanas10101111.gwl.controller.exeption.InvalidSignatureException;
 import com.github.afanas10101111.gwl.service.CryptoService;
 import com.github.afanas10101111.gwl.service.ScriptExecutor;
+import com.github.afanas10101111.gwl.service.exception.ScriptFileAccessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -39,7 +40,7 @@ public class WebhookController {
             @PathVariable String scriptName,
             @RequestHeader(X_HUB_SIGNATURE_256) String signature,
             @RequestBody String payload
-    ) throws JsonProcessingException {
+    ) throws JsonProcessingException, ScriptFileAccessException {
         if (!cryptoService.hmacSignatureIsValid(payload, signature.replaceFirst(SIGNATURE_PREFIX_REGEX, ""))) {
             throw new InvalidSignatureException();
         }

@@ -1,6 +1,6 @@
 package com.github.afanas10101111.gwl.controller;
 
-import com.github.afanas10101111.gwl.exeption.ScriptFileAccessException;
+import com.github.afanas10101111.gwl.service.exception.ScriptFileAccessException;
 import com.github.afanas10101111.gwl.service.CryptoService;
 import com.github.afanas10101111.gwl.service.ScriptExecutor;
 import org.junit.jupiter.api.BeforeEach;
@@ -136,7 +136,7 @@ class WebhookControllerTest {
 
     @Test
     void notExistingScriptFileShouldBeHandled() throws Exception {
-        doThrow(new ScriptFileAccessException("")).when(scriptExecutorMock).execute(anyString());
+        doThrow(new ScriptFileAccessException(SCRIPT_NAME)).when(scriptExecutorMock).execute(anyString());
 
         String payload = readFile(REQ_WITH_REF_TO_MAIN_LOCATION);
         performPushEvent(APPLICATION_JSON, WebhookController.X_HUB_SIGNATURE_256, payload)
