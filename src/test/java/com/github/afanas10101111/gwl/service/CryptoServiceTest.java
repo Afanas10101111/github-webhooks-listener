@@ -1,14 +1,11 @@
 package com.github.afanas10101111.gwl.service;
 
-import com.github.afanas10101111.gwl.exeption.HmacSignatureValidationException;
 import com.github.afanas10101111.gwl.service.impl.CryptoServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest(classes = CryptoServiceImpl.class)
 class CryptoServiceTest {
@@ -20,25 +17,19 @@ class CryptoServiceTest {
     private CryptoService cryptoService;
 
     @Test
-    void validationOfValidHmacSignatureShouldNotThrowException() {
-        assertDoesNotThrow(() -> cryptoService.validateHmacSignature(PAYLOAD, VALID_SIGNATURE));
+    void validationResultOfValidHmacSignatureShouldBeTrue() {
+        assertThat(cryptoService.hmacSignatureIsValid(PAYLOAD, VALID_SIGNATURE)).isTrue();
     }
 
     @Test
-    void validationOfInvalidHmacSignatureShouldThrowMacValidationException() {
-        HmacSignatureValidationException exception = assertThrows(
-                HmacSignatureValidationException.class,
-                () -> cryptoService.validateHmacSignature(PAYLOAD, INVALID_SIGNATURE)
-        );
-        assertThat(exception.getMessage()).isEqualTo(CryptoServiceImpl.ERROR);
+    void validationResultOfInvalidHmacSignatureShouldBeFalse() {
+        assertThat(cryptoService.hmacSignatureIsValid(PAYLOAD, INVALID_SIGNATURE)).isFalse();
     }
 
     @Test
-    void nullPayloadShouldThrowMacValidationException() {
-        HmacSignatureValidationException exception = assertThrows(
-                HmacSignatureValidationException.class,
-                () -> cryptoService.validateHmacSignature(null, INVALID_SIGNATURE)
-        );
-        assertThat(exception.getMessage()).isNotEqualTo(CryptoServiceImpl.ERROR);
+    void nullParametersValidationShouldBeFalse() {
+        assertThat(cryptoService.hmacSignatureIsValid(null, VALID_SIGNATURE)).isFalse();
+        assertThat(cryptoService.hmacSignatureIsValid(PAYLOAD, null)).isFalse();
+        assertThat(cryptoService.hmacSignatureIsValid(null, null)).isFalse();
     }
 }
