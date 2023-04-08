@@ -1,12 +1,13 @@
 package com.github.afanas10101111.gwl.service.impl;
 
-import com.github.afanas10101111.gwl.exeption.ScriptFileAccessException;
+import com.github.afanas10101111.gwl.service.exception.ScriptFileAccessException;
 import com.github.afanas10101111.gwl.service.ScriptExecutor;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileAlreadyExistsException;
@@ -44,7 +45,7 @@ public class ShScriptExecutor implements ScriptExecutor {
     }
 
     @Override
-    public void execute(String scriptName) {
+    public void execute(String scriptName) throws ScriptFileAccessException {
         try {
             String scriptFilePath = getScriptFilePath(scriptName);
             log.info("execute -> {}", scriptFilePath);
@@ -63,7 +64,7 @@ public class ShScriptExecutor implements ScriptExecutor {
                     .map(f -> appFolderPath.resolve(f).toString())
                     .findFirst()
                     .orElseThrow(
-                            () -> new ScriptFileAccessException(String.format(SCRIPT_FILE_NOT_FOUND_FORMAT, scriptName))
+                            () -> new FileNotFoundException(String.format(SCRIPT_FILE_NOT_FOUND_FORMAT, scriptName))
                     );
         }
     }

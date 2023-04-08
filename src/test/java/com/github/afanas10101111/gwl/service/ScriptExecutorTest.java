@@ -1,6 +1,6 @@
 package com.github.afanas10101111.gwl.service;
 
-import com.github.afanas10101111.gwl.exeption.ScriptFileAccessException;
+import com.github.afanas10101111.gwl.service.exception.ScriptFileAccessException;
 import com.github.afanas10101111.gwl.service.impl.ShScriptExecutor;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -38,7 +38,8 @@ class ScriptExecutorTest {
     }
 
     @Test
-    void executionExistingFileShouldExecRuntime() throws NoSuchFieldException, IllegalAccessException, IOException {
+    void executionExistingFileShouldExecRuntime()
+            throws NoSuchFieldException, IllegalAccessException, IOException, ScriptFileAccessException {
         Field appFolderPathField = ShScriptExecutor.class.getDeclaredField(APP_FOLDER_PATH_FIELD_NAME);
         appFolderPathField.setAccessible(true);
         Path appFolderPath = (Path) appFolderPathField.get(scriptExecutor);

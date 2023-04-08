@@ -1,8 +1,8 @@
 package com.github.afanas10101111.gwl.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.github.afanas10101111.gwl.exeption.InvalidSignatureException;
-import com.github.afanas10101111.gwl.exeption.ScriptFileAccessException;
+import com.github.afanas10101111.gwl.controller.exeption.InvalidSignatureException;
+import com.github.afanas10101111.gwl.service.exception.ScriptFileAccessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
