@@ -94,6 +94,16 @@ class WebhookControllerTest {
     }
 
     @Test
+    void requestWithInvalidMediaTypeShouldBeHandled() throws Exception {
+        String payload = readFile(REQ_WITH_REF_TO_MAIN_LOCATION);
+        performPushEvent(APPLICATION_FORM_URLENCODED, WebhookController.X_HUB_SIGNATURE_256, payload)
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+        verify(cryptoServiceMock, never()).hmacSignatureIsValid(anyString(), anyString());
+        verify(scriptExecutorMock, never()).execute(anyString());
+    }
+
+    @Test
     void requestWithoutBodyShouldBeHandled() throws Exception {
         performPushEvent(APPLICATION_JSON, WebhookController.X_HUB_SIGNATURE_256, "")
                 .andDo(print())
@@ -103,12 +113,12 @@ class WebhookControllerTest {
     }
 
     @Test
-    void httpMediaTypeNotSupportedExceptionShouldBeHandled() throws Exception {
-        String payload = readFile(REQ_WITH_REF_TO_MAIN_LOCATION);
-        performPushEvent(APPLICATION_FORM_URLENCODED, WebhookController.X_HUB_SIGNATURE_256, payload)
+    void requestWithNotJsonBodyShouldBeHandled() throws Exception {
+        String payload = readFile(REQ_WITH_NOT_JSON_LOCATION);
+        performPushEvent(APPLICATION_JSON, WebhookController.X_HUB_SIGNATURE_256, payload)
                 .andDo(print())
                 .andExpect(status().isBadRequest());
-        verify(cryptoServiceMock, never()).hmacSignatureIsValid(anyString(), anyString());
+        verify(cryptoServiceMock, only()).hmacSignatureIsValid(payload, SIGNATURE);
         verify(scriptExecutorMock, never()).execute(anyString());
     }
 
@@ -125,17 +135,7 @@ class WebhookControllerTest {
     }
 
     @Test
-    void jsonProcessingExceptionShouldBeHandled() throws Exception {
-        String payload = readFile(REQ_WITH_NOT_JSON_LOCATION);
-        performPushEvent(APPLICATION_JSON, WebhookController.X_HUB_SIGNATURE_256, payload)
-                .andDo(print())
-                .andExpect(status().isBadRequest());
-        verify(cryptoServiceMock, only()).hmacSignatureIsValid(payload, SIGNATURE);
-        verify(scriptExecutorMock, never()).execute(anyString());
-    }
-
-    @Test
-    void scriptFileAccessExceptionShouldBeHandled() throws Exception {
+    void notExistingScriptFileShouldBeHandled() throws Exception {
         doThrow(new ScriptFileAccessException("")).when(scriptExecutorMock).execute(anyString());
 
         String payload = readFile(REQ_WITH_REF_TO_MAIN_LOCATION);
@@ -143,6 +143,7 @@ class WebhookControllerTest {
                 .andDo(print())
                 .andExpect(status().isNotFound());
         verify(cryptoServiceMock, only()).hmacSignatureIsValid(payload, SIGNATURE);
+        verify(scriptExecutorMock, only()).execute(SCRIPT_NAME);
     }
 
     @Test
@@ -154,6 +155,7 @@ class WebhookControllerTest {
                 .andDo(print())
                 .andExpect(status().isInternalServerError());
         verify(cryptoServiceMock, only()).hmacSignatureIsValid(payload, SIGNATURE);
+        verify(scriptExecutorMock, only()).execute(SCRIPT_NAME);
     }
 
     private String readFile(String requestFileLocation) throws IOException {
